@@ -1,0 +1,50 @@
+<head>
+    <style> body { margin: 0; } </style>
+  
+    <script src="//unpkg.com/react/umd/react.production.min.js"></script>
+    <script src="//unpkg.com/react-dom/umd/react-dom.production.min.js"></script>
+    <script src="//unpkg.com/@babel/standalone"></script>
+  
+    <script src="//unpkg.com/react-globe.gl"></script>
+    <!--<script src="../../dist/react-globe.gl.js"></script>-->
+  </head>
+  
+  <body>
+  <div id="globeViz"></div>
+  
+  <script type="text/jsx">
+    const { useState, useEffect } = React;
+  
+    const World = () => {
+      const [places, setPlaces] = useState([]);
+  
+      useEffect(() => {
+        // load data
+        fetch('ne_110m_populated_places_simple.geojson').then(res => res.json())
+          .then(({ features }) => setPlaces(features));
+      }, []);
+  
+      return <Globe
+        globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
+        backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
+  
+        labelsData={places}
+        labelLat={d => d.properties.latitude}
+        labelLng={d => d.properties.longitude}
+        labelText={d => d.properties.name}
+        labelSize={d => Math.sqrt(d.properties.pop_max) * 4e-4}
+        labelDotRadius={d => Math.sqrt(d.properties.pop_max) * 4e-4}
+        labelColor={() => 'rgba(255, 0, 255, 0.75)'}
+        onLabelClick={(label, event, { lat, lng, altitude }) => {
+            window.location.href = `https://map-99994.bubbleapps.io/version-test?debug_mode=true`;
+          }}          
+        labelResolution={2}
+      />;
+    };
+  
+    ReactDOM.render(
+      <World />,
+      document.getElementById('globeViz')
+    );
+  </script>
+  </body>
